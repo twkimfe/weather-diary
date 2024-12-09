@@ -1,6 +1,6 @@
 @font-face {
   font-family: "NanumGothicCoding";
-  src: url(https://hangeul.pstatic.net/hangeul_static/css/nanum-gothic-coding.css);
+  src: url("/NanumGothicCoding-Regular.ttf");
 }
 
 body * {

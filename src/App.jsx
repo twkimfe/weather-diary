@@ -1,36 +1,52 @@
 import { useState } from "react";
 import "./App.css";
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { useReducer } from "react";
+import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Diary from "./pages/Diary";
 import New from "./pages/New";
+import Edit from "./pages/Edit";
 import Notfound from "./pages/Notfound";
-import Button from "./components/Button";
-import Header from "./components/Header";
 
 // 1. "/": home page 모든 일기 조회
 // 2. "/new": new page 새 일기 작성
 // 3. "/diary": diary 일기 상세 조회
 
-function App() {
-  const nav = useNavigate();
+const mockData = [
+  {
+    id: 1,
+    createdDate: new Date().getTime(),
+    weather: 1,
+    content: "1번 일기 내용",
+  },
+  {
+    id: 2,
+    createdDate: new Date().getTime(),
+    weather: 2,
+    content: "2번 일기 내용",
+  },
+  {
+    id: 3,
+    createdDate: new Date().getTime(),
+    weather: 4,
+    content: "3번 일기 내용",
+  },
+];
 
-  const onClickButton = () => {
-    nav("/new");
-  };
+function reducer(state, action) {
+  return state;
+}
+
+function App() {
+  const [data, dispatch] = useReducer(reducer, mockData);
 
   return (
     <>
-      <Header
-        title={"Header"}
-        leftChild={<Button text={"<"} />}
-        rightChild={<Button text={">"} />}
-      />
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/new" element={<New />} />
         <Route path="/diary/:id" element={<Diary />} />
+        <Route path="/edit/:id" element={<Edit />} />
         <Route path="*" element={<Notfound />} />
       </Routes>
     </>
