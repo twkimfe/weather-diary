@@ -1,0 +1,38 @@
+.DiaryItem {
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+
+  padding: 15px 0px;
+  border-bottom: 1px solid rgb(236, 236, 236);
+}
+
+.DiaryItem .weather_section {
+  min-width: 120px;
+  height: 80px;
+
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+
+  border-radius: 5px;
+}
+
+.DiaryItem .info_section {
+  flex: 1;
+  cursor: pointer;
+}
+
+.DiaryItem .info_section .created_date {
+  font-weight: bold;
+  font-size: 23px;
+  padding: 0px 0px 10px 0px;
+}
+
+.DiaryItem .info_section .content {
+  font-size: 18px;
+}
+
+.DiaryItem .button_section {
+  min-width: 70px;
+}
