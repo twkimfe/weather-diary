@@ -32,6 +32,8 @@ const getMonthlyData = (pivotDate, data) => {
 const Home = () => {
   const data = useContext(DiaryStateContext);
   const [pivotDate, setPivotDate] = useState(new Date());
+  const [originalMonth] = useState(new Date());
+  // 초기 월 저장
 
   const monthlyData = getMonthlyData(pivotDate, data);
   console.log(monthlyData);
@@ -43,12 +45,26 @@ const Home = () => {
     setPivotDate(new Date(pivotDate.getFullYear(), pivotDate.getMonth() + 1));
   };
 
+  // 현재 월이 원래 월인지 확인하는 함수
+  const isCurrentMonth =
+    pivotDate.getMonth() === originalMonth.getMonth() &&
+    pivotDate.getFullYear() === originalMonth.getFullYear();
+
+  // onTitleClick 함수
+  const onTitleClick = () => {
+    if (!isCurrentMonth) {
+      setPivotDate(new Date(originalMonth));
+    }
+  };
+
   return (
     <div>
       <Header
         title={`${pivotDate.getFullYear()}년 ${pivotDate.getMonth() + 1}월`}
         leftChild={<Button onClick={onDecreaseMonth} text={"<"} />}
         rightChild={<Button onClick={onIncreaseMonth} text={">"} />}
+        isCurrentMonth={isCurrentMonth}
+        onTitleClick={onTitleClick}
       />
       <DiaryList data={monthlyData} />
     </div>
