@@ -1,8 +1,7 @@
 // src/api/weatherApi.js
-const API_KEY = import.meta.env.VITE_WEATHER_API_KEY; // OpenWeatherMap API 키
+const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
 
-// 날씨 상태 한글 매핑
 const weatherKorean = {
   Clear: "맑음",
   Clouds: "흐림",
@@ -26,12 +25,14 @@ export const getCurrentWeather = async (lat, lon) => {
       `${BASE_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=kr`
     );
     const data = await response.json();
+    console.log(data);
     return {
       temp: data.main.temp,
       weather:
-        weatherKorean[data.weather[0].main] || data.weather[0].description, // 한글 매핑 적용
+        weatherKorean[data.weather[0].main] || data.weather[0].description,
       icon: data.weather[0].icon,
-      originalWeather: data.weather[0].main, // 원본 날씨 상태도 저장
+      originalWeather: data.weather[0].main,
+      cityName: data.name, // 도시 이름 추가
     };
   } catch (error) {
     console.error("날씨 정보를 가져오는데 실패했습니다:", error);

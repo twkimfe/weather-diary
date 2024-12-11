@@ -1,51 +1,6 @@
-// src/components/WeatherDisplay/WeatherDisplay.jsx
 import { useState, useEffect } from "react";
 import { getCurrentWeather } from "../../api/weatherApi";
 import { getCurrentLocation } from "../../utils/locationUtils";
-
-// Mock 데이터 추가
-const mockData = [
-  {
-    id: 1,
-    createdDate: new Date("2024-11-19").getTime(),
-    weather: 1,
-    content: "1번 일기 내용",
-    location: {
-      lat: 40.7128, // 뉴욕
-      lon: -74.006,
-    },
-  },
-  {
-    id: 2,
-    createdDate: new Date("2024-12-09").getTime(),
-    weather: 2,
-    content: "2번 일기 내용",
-    location: {
-      lat: 39.9042, // 베이징
-      lon: 116.4074,
-    },
-  },
-  {
-    id: 3,
-    createdDate: new Date("2025-01-08").getTime(),
-    weather: 4,
-    content: "3번 일기 내용",
-    location: {
-      lat: 35.6762, // 도쿄
-      lon: 139.6503,
-    },
-  },
-  {
-    id: 4,
-    createdDate: new Date("2024-12-02").getTime(),
-    weather: 3,
-    content: "4번 일기 내용",
-    location: {
-      lat: 31.2304, // 상하이
-      lon: 121.4737,
-    },
-  },
-];
 
 const WeatherDisplay = ({ locationData }) => {
   const [weatherData, setWeatherData] = useState(null);
@@ -56,9 +11,14 @@ const WeatherDisplay = ({ locationData }) => {
     const fetchWeather = async () => {
       try {
         const location = locationData || (await getCurrentLocation());
-        const weather = await getCurrentWeather(location.lat, location.lon);
+        const weather = await getCurrentWeather(
+          location.latitude || location.lat,
+          location.longitude || location.lon
+        );
+
         setWeatherData(weather);
       } catch (err) {
+        console.error("Weather fetch error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -77,11 +37,15 @@ const WeatherDisplay = ({ locationData }) => {
         {weatherData?.icon && (
           <img
             src={`http://openweathermap.org/img/wn/${weatherData.icon}@2x.png`}
-            alt="weather icon"
+            alt="날씨 아이콘"
           />
         )}
       </div>
       <div className="weather-info">
+        <div className="city-name">
+          {weatherData?.cityName || "알 수 없는 위치"}
+        </div>
+        <div className="temperature">{Math.round(weatherData?.temp)}°C</div>
         <div className="description">{weatherData?.weather}</div>
       </div>
     </div>
