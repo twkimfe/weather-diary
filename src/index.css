@@ -3,6 +3,10 @@
   src: url("/NanumGothicCoding-Regular.ttf");
 }
 
+body {
+  display: flex;
+}
+
 body * {
   font-family: "NanumGothicCoding";
 }

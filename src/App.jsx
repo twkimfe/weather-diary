@@ -19,8 +19,8 @@ const mockData = [
     weather: 1,
     content: "1번 일기 내용",
     location: {
-      lat: 40.7128, // 뉴욕
-      lon: -74.006,
+      lat: 31.2304, // 상하이
+      lon: 121.4737,
     },
   },
   {
@@ -49,8 +49,8 @@ const mockData = [
     weather: 3,
     content: "4번 일기 내용",
     location: {
-      lat: 31.2304, // 상하이
-      lon: 121.4737,
+      lat: 40.7128, // 뉴욕
+      lon: -74.006,
     },
   },
 ];
