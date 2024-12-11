@@ -1,10 +1,15 @@
-import WeatherDisplay from "../components/WeatherDisplay/WeatherDisplay";
+import Header from "../components/Header/Header";
+import Button from "../components/Button/Button";
+import Editor from "./Editor";
 
 const New = () => {
   return (
     <div>
-      <h1>New</h1>
-      <WeatherDisplay />
+      <Header
+        title={"새 일기 쓰기"}
+        leftChild={<Button text={"< 뒤로 가기"} />}
+      />
+      <Editor />
     </div>
   );
 };
