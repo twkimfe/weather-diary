@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getCurrentWeather } from "../../api/weatherApi";
 import { getCurrentLocation } from "../../utils/locationUtils";
 
@@ -7,26 +7,34 @@ const WeatherDisplay = ({ locationData }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const location = locationData || (await getCurrentLocation());
-        const weather = await getCurrentWeather(
-          location.latitude || location.lat,
-          location.longitude || location.lon
-        );
-
-        setWeatherData(weather);
-      } catch (err) {
-        console.error("Weather fetch error:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  // fetchWeather 함수를 useCallback으로 메모이제이션
+  const fetchWeather = useCallback(async () => {
+    try {
+      // 이미 날씨 데이터가 있고 locationData가 변경되지 않았다면 스킵
+      if (weatherData && locationData === weatherData.locationData) {
+        return;
       }
-    };
 
+      const location = locationData || (await getCurrentLocation());
+      const weather = await getCurrentWeather(
+        location.latitude || location.lat,
+        location.longitude || location.lon
+      );
+
+      setWeatherData({
+        ...weather,
+        locationData, // 현재 locationData 저장
+      });
+    } catch (err) {
+      console.error("Weather fetch error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [locationData, weatherData]);
+  useEffect(() => {
     fetchWeather();
-  }, [locationData]);
+  }, [fetchWeather]);
 
   if (loading) return <div>날씨 정보를 불러오는 중...</div>;
   if (error) return <div>날씨 정보를 불러오는데 실패했습니다</div>;

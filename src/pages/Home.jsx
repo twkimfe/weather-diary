@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import { DiaryStateContext } from "../App";
 
 import Header from "../components/Header/Header";
@@ -34,28 +34,36 @@ const Home = () => {
   const [pivotDate, setPivotDate] = useState(new Date());
   const [originalMonth] = useState(new Date());
   // 초기 월 저장
+  const [monthlyData, setMonthlyData] = useState([]); // 월별 데이터 상태 추가
 
-  const monthlyData = getMonthlyData(pivotDate, data);
-  console.log(monthlyData);
+  // useEffect로 data 변경 감지 및 monthlyData 업데이트
+  useEffect(() => {
+    setMonthlyData(getMonthlyData(pivotDate, data));
+  }, [data, pivotDate]);
 
-  const onDecreaseMonth = () => {
+  // useCallback으로 메모이제이션
+  const onDecreaseMonth = useCallback(() => {
     setPivotDate(new Date(pivotDate.getFullYear(), pivotDate.getMonth() - 1));
-  };
-  const onIncreaseMonth = () => {
+  }, [pivotDate]);
+
+  const onIncreaseMonth = useCallback(() => {
     setPivotDate(new Date(pivotDate.getFullYear(), pivotDate.getMonth() + 1));
-  };
+  }, [pivotDate]);
 
   // 현재 월이 원래 월인지 확인하는 함수
-  const isCurrentMonth =
-    pivotDate.getMonth() === originalMonth.getMonth() &&
-    pivotDate.getFullYear() === originalMonth.getFullYear();
+  const isCurrentMonth = useCallback(() => {
+    return (
+      pivotDate.getMonth() === originalMonth.getMonth() &&
+      pivotDate.getFullYear() === originalMonth.getFullYear()
+    );
+  }, [pivotDate, originalMonth]);
 
   // onTitleClick 함수
-  const onTitleClick = () => {
-    if (!isCurrentMonth) {
+  const onTitleClick = useCallback(() => {
+    if (!isCurrentMonth()) {
       setPivotDate(new Date(originalMonth));
     }
-  };
+  }, [originalMonth, isCurrentMonth]);
 
   return (
     <div>
@@ -63,7 +71,7 @@ const Home = () => {
         title={`${pivotDate.getFullYear()}년 ${pivotDate.getMonth() + 1}월`}
         leftChild={<Button onClick={onDecreaseMonth} text={"<"} />}
         rightChild={<Button onClick={onIncreaseMonth} text={">"} />}
-        isCurrentMonth={isCurrentMonth}
+        isCurrentMonth={isCurrentMonth()}
         onTitleClick={onTitleClick}
       />
       <DiaryList data={monthlyData} />

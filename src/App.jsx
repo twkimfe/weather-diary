@@ -58,7 +58,9 @@ const mockData = [
 function reducer(state, action) {
   switch (action.type) {
     case "CREATE":
-      return [action.data, ...state];
+      return [action.data, ...state].sort(
+        (a, b) => b.createdDate - a.createdDate
+      );
     case "UPDATE":
       return state.map((item) =>
         String(item.id) === String(action.data.id) ? action.data : item
@@ -75,16 +77,19 @@ export const DiaryDispatchContext = createContext();
 
 function App() {
   const [data, dispatch] = useReducer(reducer, mockData);
-  const idRef = useRef(4);
+  const idRef = useRef(5);
 
   // 새 일기 추가
   // 새 일기 추가 기능
   const onCreate = (createdDate, weather, content, diary) => {
+    const newId = idRef.current;
+    idRef.current += 1;
+
     dispatch({
       type: "CREATE",
       data: {
-        id: idRef.current++,
-        createdDate,
+        id: newId,
+        createdDate: new Date(createdDate).getTime(), // timestamp로 저장
         weather,
         content,
         diary,
