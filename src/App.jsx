@@ -79,7 +79,7 @@ function App() {
 
   // 새 일기 추가
   // 새 일기 추가 기능
-  const onCreate = (createdDate, weather, content) => {
+  const onCreate = (createdDate, weather, content, diary) => {
     dispatch({
       type: "CREATE",
       data: {
@@ -87,12 +87,13 @@ function App() {
         createdDate,
         weather,
         content,
+        diary,
       },
     });
   };
 
   // 기존 일기 수정
-  const onUpdate = (id, createdDate, weather, content) => {
+  const onUpdate = (id, createdDate, weather, content, diary) => {
     dispatch({
       type: "UPDATE",
       data: {
@@ -100,6 +101,7 @@ function App() {
         createdDate,
         weather,
         content,
+        diary,
       },
     });
   };
