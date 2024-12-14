@@ -1,7 +1,7 @@
 import "./Editor.css";
 import WeatherDisplay from "../components/WeatherDisplay/WeatherDisplay";
 import Button from "../components/Button/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const getStringedDate = (targetDate) => {
@@ -20,7 +20,7 @@ const getStringedDate = (targetDate) => {
   return `${year}-${month}-${date}`;
 };
 
-const Editor = ({ onSubmit }) => {
+const Editor = ({ initData, onSubmit }) => {
   // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오기
   const today = new Date().toISOString().split("T")[0];
   const [input, setInput] = useState({
@@ -30,6 +30,15 @@ const Editor = ({ onSubmit }) => {
     diary: "",
   });
   const nav = useNavigate();
+
+  useEffect(() => {
+    if (initData) {
+      setInput({
+        ...initData,
+        createdDate: new Date(Number(initData.createdDate)),
+      });
+    }
+  }, [initData]);
 
   const onChangeInput = (e) => {
     console.log(e.target.name);

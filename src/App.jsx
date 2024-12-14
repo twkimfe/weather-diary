@@ -17,7 +17,8 @@ const mockData = [
     id: 1,
     createdDate: new Date("2024-11-19").getTime(),
     weather: 1,
-    content: "1번 일기 내용",
+    content: "1번 일기 제목",
+    diary: "일기 내용",
     location: {
       lat: 31.2304, // 상하이
       lon: 121.4737,
@@ -27,7 +28,8 @@ const mockData = [
     id: 2,
     createdDate: new Date("2024-12-09").getTime(),
     weather: 2,
-    content: "2번 일기 내용",
+    content: "2번 일기 제목",
+    diary: "일기 내용",
     location: {
       lat: 39.9042, // 베이징
       lon: 116.4074,
@@ -37,7 +39,8 @@ const mockData = [
     id: 3,
     createdDate: new Date("2025-01-08").getTime(),
     weather: 4,
-    content: "3번 일기 내용",
+    content: "3번 일기 제목",
+    diary: "일기 내용",
     location: {
       lat: 35.6762, // 도쿄
       lon: 139.6503,
@@ -47,7 +50,8 @@ const mockData = [
     id: 4,
     createdDate: new Date("2024-12-02").getTime(),
     weather: 3,
-    content: "4번 일기 내용",
+    content: "4번 일기 제목",
+    diary: "일기 내용",
     location: {
       lat: 40.7128, // 뉴욕
       lon: -74.006,
