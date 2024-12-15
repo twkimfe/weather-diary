@@ -5,22 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentWeather } from "../api/weatherApi";
 import { getCurrentLocation } from "../utils/locationUtils";
-
-const getStringedDate = (targetDate) => {
-  // 날짜 -> YYYY-MM-DD
-  let year = targetDate.getFullYear();
-  let month = targetDate.getMonth() + 1;
-  let date = targetDate.getDate();
-
-  if (month < 10) {
-    month = `0${month}`;
-  }
-  if (date < 10) {
-    date = `0${date}`;
-  }
-
-  return `${year}-${month}-${date}`;
-};
+import { getStringedDate } from "../utils/get-stringed-date";
 
 const Editor = ({ initData, onSubmit }) => {
   const nav = useNavigate();
@@ -154,6 +139,7 @@ const Editor = ({ initData, onSubmit }) => {
             />
           )}
         </div>
+        <p className="info">날씨는 수정이 안되요.</p>
       </section>
       <section className="content_section">
         <h4>일기 제목</h4>

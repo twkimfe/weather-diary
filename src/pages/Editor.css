@@ -35,10 +35,17 @@ textarea {
   min-height: auto;
   resize: none;
 }
+.Editor .weather_section .info {
+  color: silver;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .Editor .weather_section .weather > * {
   display: flex;
-  justify-content: left;
+  justify-content: center;
   align-items: center;
 }
 
