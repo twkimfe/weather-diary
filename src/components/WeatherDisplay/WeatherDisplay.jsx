@@ -5,52 +5,84 @@ import { getCurrentLocation } from "../../utils/locationUtils";
 const WeatherDisplay = ({ locationData }) => {
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [lastLocation, setLastLocation] = useState(null);
 
-  // fetchWeather 함수를 useCallback으로 메모이제이션
-  const fetchWeather = useCallback(async () => {
+  const fetchWeather = useCallback(async (location) => {
     try {
-      // 이미 날씨 데이터가 있고 locationData가 변경되지 않았다면 스킵
-      if (weatherData && locationData === weatherData.locationData) {
-        return;
-      }
+      setLoading(true);
+      const weather = await getCurrentWeather(
+        location.latitude || location.lat,
+        location.longitude || location.lon
+      );
 
-      let location = null;
-      try {
-        if (locationData && locationData.lat && locationData.lon) {
-          location = locationData;
-        } else {
-          location = await getCurrentLocation();
-        }
-
-        const weather = await getCurrentWeather(
-          location.latitude || location.lat,
-          location.longitude || location.lon
-        );
-
-        setWeatherData({
-          ...weather,
-          locationData: location,
-        });
-        setError(null);
-      } catch (locationError) {
-        setError(locationError.message);
-        console.log("위치 정보를 가져올 수 없습니다");
-        return;
-      }
+      setWeatherData({
+        ...weather,
+        locationData: {
+          lat: location.latitude || location.lat,
+          lon: location.longitude || location.lon,
+        },
+      });
+      setError(null);
     } catch (err) {
-      console.error("Weather fetch error:", err);
+      console.error("날씨 정보를 가져오는데 실패했습니다:", err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [locationData]);
-  useEffect(() => {
-    fetchWeather();
-  }, [fetchWeather]);
+  }, []); // 의존성 제거
 
-  if (loading) return <div>날씨 정보를 불러오는 중...</div>;
-  if (error) return <div>날씨 정보를 불러오는데 실패했습니다</div>;
+  useEffect(() => {
+    const getWeatherData = async () => {
+      // 이미 로딩 중이면 스킵
+      if (loading) return;
+
+      // 현재 위치 정보 획득
+      const currentLocation =
+        locationData?.lat || locationData?.latitude
+          ? locationData
+          : await getCurrentLocation().catch((error) => {
+              console.error("위치 정보를 가져올 수 없습니다:", error);
+              setError(error.message);
+              return null;
+            });
+
+      if (!currentLocation) return;
+
+      // 위치가 변경되었는지 확인
+      const newLat = currentLocation.latitude || currentLocation.lat;
+      const newLon = currentLocation.longitude || currentLocation.lon;
+
+      if (lastLocation?.lat === newLat && lastLocation?.lon === newLon) {
+        return;
+      }
+
+      setLastLocation({ lat: newLat, lon: newLon });
+      await fetchWeather(currentLocation);
+    };
+
+    getWeatherData();
+  }, [locationData, fetchWeather, lastLocation]);
+
+  // 로딩 상태와 에러 상태는 early return으로 처리
+  if (loading) {
+    return (
+      <div className="weather-display loading">날씨 정보를 불러오는 중...</div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="weather-display error">
+        날씨 정보를 불러오는데 실패했습니다
+      </div>
+    );
+  }
+
+  // 날씨 데이터가 없는 경우도 처리
+  if (!weatherData) {
+    return <div className="weather-display no-data">날씨 정보가 없습니다</div>;
+  }
 
   return (
     <div className="weather-display">
