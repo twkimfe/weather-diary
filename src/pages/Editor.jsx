@@ -72,7 +72,6 @@ const Editor = ({ initData, onSubmit }) => {
           onChange={onChangeInput}
           value={getStringedDate(input.createdDate)}
           type="date"
-          defaultValue={today}
         />
       </section>
       <section className="weather_section">
