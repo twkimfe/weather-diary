@@ -18,21 +18,32 @@ const weatherKorean = {
   Squall: "돌풍",
   Tornado: "토네이도",
 };
-
 export const getCurrentWeather = async (lat, lon) => {
+  // 위도, 경도 값 검증 추가
+  if (!lat || !lon) {
+    throw new Error("위도와 경도 값이 필요합니다");
+  }
+
   try {
     const response = await fetch(
       `${BASE_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=kr`
     );
     const data = await response.json();
+
+    // API 응답 상태 확인 추가
+    if (response.status !== 200) {
+      throw new Error(`날씨 API 오류: ${data.message}`);
+    }
+
     console.log(data);
+
     return {
       temp: data.main.temp,
       weather:
         weatherKorean[data.weather[0].main] || data.weather[0].description,
       icon: data.weather[0].icon,
       originalWeather: data.weather[0].main,
-      cityName: data.name, // 도시 이름 추가
+      cityName: data.name,
     };
   } catch (error) {
     console.error("날씨 정보를 가져오는데 실패했습니다:", error);

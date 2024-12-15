@@ -1,8 +1,10 @@
 import "./Editor.css";
 import WeatherDisplay from "../components/WeatherDisplay/WeatherDisplay";
 import Button from "../components/Button/Button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCurrentWeather } from "../api/weatherApi";
+import { getCurrentLocation } from "../utils/locationUtils";
 
 const getStringedDate = (targetDate) => {
   // 날짜 -> YYYY-MM-DD
@@ -21,15 +23,85 @@ const getStringedDate = (targetDate) => {
 };
 
 const Editor = ({ initData, onSubmit }) => {
-  // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오기
-  const today = new Date().toISOString().split("T")[0];
+  const nav = useNavigate();
   const [input, setInput] = useState({
     createdDate: new Date(),
-    weather: 3,
+    weather: {
+      cityName: "",
+      temp: 0,
+      weather: "",
+      icon: "",
+      location: {
+        lat: null,
+        lon: null,
+      },
+    },
     content: "",
     diary: "",
   });
-  const nav = useNavigate();
+
+  241215;
+
+  const [error, setError] = useState(null); // 에러 상태 추가
+  const fetchWeather = useCallback(async () => {
+    try {
+      // initData가 있으면 저장된 위치 정보 사용
+      let locationData;
+      if (initData?.weather?.location) {
+        locationData = initData.weather.location;
+      } else {
+        // 현재 위치 정보 가져오기 시도
+        try {
+          locationData = await getCurrentLocation();
+        } catch (locationError) {
+          setError(locationError.message);
+
+          console.log("위치 정보를 가져올 수 없습니다");
+          return;
+        }
+      }
+
+      // 위치 정보 검증
+      if (!locationData || !locationData.lat || !locationData.lon) {
+        throw new Error("유효하지 않은 위치 정보입니다");
+      }
+
+      const weatherData = await getCurrentWeather(
+        locationData.lat,
+        locationData.lon
+      );
+
+      setInput((prev) => ({
+        ...prev,
+        weather: {
+          cityName: weatherData.cityName,
+          temp: weatherData.temp,
+          weather: weatherData.weather,
+          icon: weatherData.icon,
+          location: {
+            lat: locationData.lat,
+            lon: locationData.lon,
+          },
+        },
+      }));
+
+      // 날씨 정보를 성공적으로 가져왔으면 에러 상태 초기화
+      setError(null);
+    } catch (error) {
+      console.error("날씨 정보 가져오기 실패:", error);
+      setError(
+        "날씨 정보를 가져오는데 실패했습니다. 잠시 후 다시 시도해주세요."
+      );
+    }
+  }, [initData]);
+
+  // 컴포넌트 마운트 시 날씨 정보 가져오기
+  useEffect(() => {
+    if (!initData) {
+      // 새 일기 작성 시에만 현재 날씨 가져오기
+      fetchWeather();
+    }
+  }, [fetchWeather, initData]);
 
   useEffect(() => {
     if (initData) {
@@ -41,11 +113,6 @@ const Editor = ({ initData, onSubmit }) => {
   }, [initData]);
 
   const onChangeInput = (e) => {
-    console.log(e.target.name);
-    // 어떤 요소에 입력이 들어온 건지 확인
-    console.log(e.target.value);
-    // 입력 값이 무엇인지 확인
-
     let name = e.target.name;
     let value = e.target.value;
 
@@ -77,7 +144,15 @@ const Editor = ({ initData, onSubmit }) => {
       <section className="weather_section">
         <h4>오늘의 날씨</h4>
         <div className="weather">
-          <WeatherDisplay />
+          {error ? (
+            <div className="weather-error">{error}</div>
+          ) : (
+            <WeatherDisplay
+              locationData={
+                initData?.weather?.location || input.weather.location
+              }
+            />
+          )}
         </div>
       </section>
       <section className="content_section">

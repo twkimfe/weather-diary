@@ -15,23 +15,36 @@ const WeatherDisplay = ({ locationData }) => {
         return;
       }
 
-      const location = locationData || (await getCurrentLocation());
-      const weather = await getCurrentWeather(
-        location.latitude || location.lat,
-        location.longitude || location.lon
-      );
+      let location = null;
+      try {
+        if (locationData && locationData.lat && locationData.lon) {
+          location = locationData;
+        } else {
+          location = await getCurrentLocation();
+        }
 
-      setWeatherData({
-        ...weather,
-        locationData, // 현재 locationData 저장
-      });
+        const weather = await getCurrentWeather(
+          location.latitude || location.lat,
+          location.longitude || location.lon
+        );
+
+        setWeatherData({
+          ...weather,
+          locationData: location,
+        });
+        setError(null);
+      } catch (locationError) {
+        setError(locationError.message);
+        console.log("위치 정보를 가져올 수 없습니다");
+        return;
+      }
     } catch (err) {
       console.error("Weather fetch error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [locationData, weatherData]);
+  }, [locationData]);
   useEffect(() => {
     fetchWeather();
   }, [fetchWeather]);
@@ -53,8 +66,10 @@ const WeatherDisplay = ({ locationData }) => {
         <div className="city-name">
           {weatherData?.cityName || "알 수 없는 위치"}
         </div>
-        <div className="temperature">{Math.round(weatherData?.temp)}°C</div>
-        <div className="description">{weatherData?.weather}</div>
+        <div className="temperature">
+          {weatherData?.temp ? `${Math.round(weatherData.temp)}°C` : ""}
+        </div>
+        <div className="description">{weatherData?.weather || ""}</div>
       </div>
     </div>
   );

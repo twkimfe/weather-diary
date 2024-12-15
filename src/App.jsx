@@ -16,7 +16,13 @@ const mockData = [
   {
     id: 1,
     createdDate: new Date("2024-11-19").getTime(),
-    weather: 1,
+    weather: {
+      // 날씨 API 응답 데이터 저장
+      temp: 20,
+      humidity: 65,
+      description: "맑음",
+      icon: "01d",
+    },
     content: "1번 일기 제목",
     diary: "일기 내용",
     location: {
