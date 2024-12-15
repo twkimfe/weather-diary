@@ -1,0 +1,52 @@
+.Viewer > section {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.Viewer > section > h4 {
+  font-size: 22px;
+  font-weight: bold;
+  padding: 5px 5px 0px 5px;
+}
+
+.Viewer .weather {
+  width: 250px;
+  height: 250px;
+  border-radius: 5px;
+  padding: 0px 5px 5px 5px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+
+  font-size: 21px;
+}
+
+.Viewer .weather .weather-icon {
+  width: 100%;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.Viewer .content-wrapper {
+  width: 100%;
+  background-color: rgb(236, 236, 236);
+  border-radius: 5px;
+
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.Viewer .content-wrapper > p {
+  padding: 20px;
+  text-align: left;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 2.5;
+}
