@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { useReducer, useRef, createContext } from "react";
 import { Routes, Route } from "react-router-dom";
@@ -12,82 +12,73 @@ import Notfound from "./pages/Notfound";
 // 2. "/new": new page 새 일기 작성
 // 3. "/diary": diary 일기 상세 조회
 
-const mockData = [
-  {
-    id: 1,
-    createdDate: new Date("2024-11-19").getTime(),
-    weather: {
-      // 날씨 API 응답 데이터 저장
-      temp: 20,
-      humidity: 65,
-      description: "맑음",
-      icon: "01d",
-    },
-    content: "1번 일기 제목",
-    diary: "일기 내용",
-    location: {
-      lat: 31.2304, // 상하이
-      lon: 121.4737,
-    },
-  },
-  {
-    id: 2,
-    createdDate: new Date("2024-12-09").getTime(),
-    weather: 2,
-    content: "2번 일기 제목",
-    diary: "일기 내용",
-    location: {
-      lat: 39.9042, // 베이징
-      lon: 116.4074,
-    },
-  },
-  {
-    id: 3,
-    createdDate: new Date("2025-01-08").getTime(),
-    weather: 4,
-    content: "3번 일기 제목",
-    diary: "일기 내용",
-    location: {
-      lat: 35.6762, // 도쿄
-      lon: 139.6503,
-    },
-  },
-  {
-    id: 4,
-    createdDate: new Date("2024-12-02").getTime(),
-    weather: 3,
-    content: "4번 일기 제목",
-    diary: "일기 내용",
-    location: {
-      lat: 40.7128, // 뉴욕
-      lon: -74.006,
-    },
-  },
-];
-
 function reducer(state, action) {
+  let nextState;
+
   switch (action.type) {
-    case "CREATE":
-      return [action.data, ...state].sort(
+    case "INIT":
+      return action.data;
+
+    case "CREATE": {
+      nextState = [action.data, ...state].sort(
         (a, b) => b.createdDate - a.createdDate
       );
-    case "UPDATE":
-      return state.map((item) =>
+      break;
+    }
+    case "UPDATE": {
+      nextState = state.map((item) =>
         String(item.id) === String(action.data.id) ? action.data : item
       );
-    case "DELETE":
-      return state.filter((item) => String(item.id) !== String(action.id));
+      break;
+    }
+    case "DELETE": {
+      nextState = state.filter((item) => String(item.id) !== String(action.id));
+      break;
+    }
     default:
       return state;
   }
+
+  localStorage.setItem("diary", JSON.stringify(nextState));
+
+  return nextState;
 }
 
 export const DiaryStateContext = createContext();
 export const DiaryDispatchContext = createContext();
 
 function App() {
-  const [data, dispatch] = useReducer(reducer, mockData);
-  const idRef = useRef(5);
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, dispatch] = useReducer(reducer, []);
+  const idRef = useRef(0);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("diary");
+    if (!storedData) {
+      setIsLoading(false);
+      return;
+    }
+    const parsedData = JSON.parse(storedData);
+    if (!Array.isArray(parsedData)) {
+      setIsLoading(false);
+      return;
+    }
+
+    let maxId = 0;
+    parsedData.forEach((item) => {
+      if (Number(item.id) > maxId) {
+        maxId = Number(item.id);
+      }
+    });
+
+    idRef.current = maxId + 1;
+
+    dispatch({
+      type: "INIT",
+      data: parsedData,
+    });
+    setIsLoading(false);
+  }, []);
 
   // 새 일기 추가
   // 새 일기 추가 기능
@@ -128,6 +119,10 @@ function App() {
       id,
     });
   };
+
+  if (isLoading) {
+    return <div>데이터 로딩중입니다 ...</div>;
+  }
 
   return (
     <>

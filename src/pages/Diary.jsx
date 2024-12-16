@@ -23,7 +23,7 @@ const Diary = () => {
     <div>
       <Header
         title={`${title} 일기`}
-        leftChild={<Button onClick={() => nav(-1)} text={"< 뒤로 가기"} />}
+        leftChild={<Button onClick={() => nav(-1)} text={"<"} />}
         rightChild={
           <Button onClick={() => nav(`/edit/${params.id}`)} text={"수정하기"} />
         }
