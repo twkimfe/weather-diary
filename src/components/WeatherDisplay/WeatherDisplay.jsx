@@ -1,70 +1,63 @@
-import { useState, useEffect, useCallback } from "react";
-import { getCurrentWeather } from "../../api/weatherApi";
-import { getCurrentLocation } from "../../utils/locationUtils";
+// src/components/WeatherDisplay/WeatherDisplay.jsx
 
-const WeatherDisplay = ({ locationData }) => {
-  const [weatherData, setWeatherData] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [lastLocation, setLastLocation] = useState(null);
+import { useEffect } from "react";
+import { useWeather } from "../../hooks/useWeather";
 
-  const fetchWeather = useCallback(async (location) => {
-    try {
-      setLoading(true);
-      const weather = await getCurrentWeather(
-        location.latitude || location.lat,
-        location.longitude || location.lon
-      );
+const WeatherDisplay = ({ locationData, onWeatherUpdate, isEditMode }) => {
+  console.log("WeatherDisplay props:", { locationData, isEditMode });
 
-      setWeatherData({
-        ...weather,
-        locationData: {
-          lat: location.latitude || location.lat,
-          lon: location.longitude || location.lon,
-        },
-      });
-      setError(null);
-    } catch (err) {
-      console.error("날씨 정보를 가져오는데 실패했습니다:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []); // 의존성 제거
+  const { weatherData, error, loading, getWeatherWithLocation } =
+    useWeather(locationData);
 
   useEffect(() => {
-    const getWeatherData = async () => {
-      // 이미 로딩 중이면 스킵
-      if (loading) return;
+    let isSubscribed = true; // 비동기 작업 취소를 위한 flag
 
-      // 현재 위치 정보 획득
-      const currentLocation =
-        locationData?.lat || locationData?.latitude
-          ? locationData
-          : await getCurrentLocation().catch((error) => {
-              console.error("위치 정보를 가져올 수 없습니다:", error);
-              setError(error.message);
-              return null;
-            });
+    const initWeather = async () => {
+      // Edit 모드이고 locationData가 있는 경우
+      if (isEditMode && locationData) {
+        if (!locationData.cityName || !locationData.temp) {
+          console.error("Invalid location data in edit mode:", locationData);
+          return;
+        }
 
-      if (!currentLocation) return;
+        const existingWeatherData = {
+          cityName: locationData.cityName,
+          temp: locationData.temp,
+          weather: locationData.weather,
+          icon: locationData.icon,
+          location: {
+            lat: locationData.location?.lat || locationData.lat || 0,
+            lon: locationData.location?.lon || locationData.lon || 0,
+          },
+        };
 
-      // 위치가 변경되었는지 확인
-      const newLat = currentLocation.latitude || currentLocation.lat;
-      const newLon = currentLocation.longitude || currentLocation.lon;
-
-      if (lastLocation?.lat === newLat && lastLocation?.lon === newLon) {
+        if (isSubscribed && onWeatherUpdate) {
+          onWeatherUpdate(existingWeatherData);
+        }
         return;
       }
 
-      setLastLocation({ lat: newLat, lon: newLon });
-      await fetchWeather(currentLocation);
+      // New 모드이거나 locationData가 없는 경우
+      if (!isEditMode) {
+        try {
+          const data = await getWeatherWithLocation();
+          if (isSubscribed && data && onWeatherUpdate) {
+            onWeatherUpdate(data);
+          }
+        } catch (error) {
+          console.error("Error fetching weather:", error);
+        }
+      }
     };
 
-    getWeatherData();
-  }, [locationData, fetchWeather, lastLocation]);
+    initWeather();
 
-  // 로딩 상태와 에러 상태는 early return으로 처리
+    // Cleanup function
+    return () => {
+      isSubscribed = false;
+    };
+  }, [isEditMode, locationData]); // 의존성 배열 최소화
+
   if (loading) {
     return (
       <div className="weather-display loading">날씨 정보를 불러오는 중...</div>
@@ -72,6 +65,7 @@ const WeatherDisplay = ({ locationData }) => {
   }
 
   if (error) {
+    console.error("Weather display error:", error);
     return (
       <div className="weather-display error">
         날씨 정보를 불러오는데 실패했습니다
@@ -79,11 +73,14 @@ const WeatherDisplay = ({ locationData }) => {
     );
   }
 
-  // 날씨 데이터가 없는 경우도 처리
-  if (!weatherData) {
+  if (!weatherData && !isEditMode) {
     return (
       <div className="weather-display no-data">날씨 정보를 불러오는 중...</div>
     );
+  }
+
+  if (!weatherData && isEditMode && !locationData) {
+    return null;
   }
 
   return (

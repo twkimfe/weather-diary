@@ -1,3 +1,4 @@
+// src/pages/Editor.jsx
 import "./Editor.css";
 import WeatherDisplay from "../components/WeatherDisplay/WeatherDisplay";
 import Button from "../components/Button/Button";
@@ -11,21 +12,16 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
   const nav = useNavigate();
   const [input, setInput] = useState({
     createdDate: new Date(),
-    weather: {
-      cityName: "",
-      temp: 0,
-      weather: "",
-      icon: "",
-      location: {
-        lat: null,
-        lon: null,
-      },
-    },
     content: "",
     diary: "",
   });
 
-  241215;
+  const handleWeatherUpdate = (weatherData) => {
+    setInput((prev) => ({
+      ...prev,
+      weather: weatherData,
+    }));
+  };
 
   const [error, setError] = useState(null); // 에러 상태 추가
   const fetchWeather = useCallback(async () => {
@@ -128,17 +124,10 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
       </section>
       <section className="weather_section">
         <h4>오늘의 날씨</h4>
-        <div className="weather">
-          {error ? (
-            <div className="weather-error">{error}</div>
-          ) : (
-            <WeatherDisplay
-              locationData={
-                initData?.weather?.location || input.weather.location
-              }
-            />
-          )}
-        </div>
+        <WeatherDisplay
+          locationData={initData?.weather?.location}
+          onWeatherUpdate={handleWeatherUpdate}
+        />
         {showWeatherInfo && <p className="info">날씨는 수정이 안되요.</p>}
       </section>
       <section className="content_section">
