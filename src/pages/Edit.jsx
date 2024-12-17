@@ -46,7 +46,11 @@ const Edit = () => {
           <Button onClick={onClickDelete} text={"삭제하기"} type={"NEGATIVE"} />
         }
       />
-      <Editor initData={curDiaryItem} onSubmit={onSubmit} />
+      <Editor
+        initData={curDiaryItem}
+        onSubmit={onSubmit}
+        showWeatherInfo={true}
+      />
     </div>
   );
 };

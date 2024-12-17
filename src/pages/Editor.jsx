@@ -7,7 +7,7 @@ import { getCurrentWeather } from "../api/weatherApi";
 import { getCurrentLocation } from "../utils/locationUtils";
 import { getStringedDate } from "../utils/get-stringed-date";
 
-const Editor = ({ initData, onSubmit }) => {
+const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
   const nav = useNavigate();
   const [input, setInput] = useState({
     createdDate: new Date(),
@@ -139,7 +139,7 @@ const Editor = ({ initData, onSubmit }) => {
             />
           )}
         </div>
-        <p className="info">날씨는 수정이 안되요.</p>
+        {showWeatherInfo && <p className="info">날씨는 수정이 안되요.</p>}
       </section>
       <section className="content_section">
         <h4>일기 제목</h4>
