@@ -82,7 +82,7 @@ function App() {
 
   // 새 일기 추가
   // 새 일기 추가 기능
-  const onCreate = (createdDate, weather, content, diary) => {
+  const onCreate = (createdDate, weatherData, content, diary) => {
     const newId = idRef.current;
     idRef.current += 1;
 
@@ -91,7 +91,7 @@ function App() {
       data: {
         id: newId,
         createdDate: new Date(createdDate).getTime(), // timestamp로 저장
-        weather,
+        weather: weatherData,
         content,
         diary,
       },
