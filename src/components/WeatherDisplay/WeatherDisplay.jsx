@@ -81,7 +81,9 @@ const WeatherDisplay = ({ locationData }) => {
 
   // 날씨 데이터가 없는 경우도 처리
   if (!weatherData) {
-    return <div className="weather-display no-data">날씨 정보가 없습니다</div>;
+    return (
+      <div className="weather-display no-data">날씨 정보를 불러오는 중...</div>
+    );
   }
 
   return (

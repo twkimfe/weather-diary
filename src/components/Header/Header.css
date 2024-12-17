@@ -19,6 +19,7 @@
 .Header .header_left {
   width: 25%;
   justify-content: flex-start;
+  gap: 10px;
 }
 .Header .header_right {
   width: 25%;
