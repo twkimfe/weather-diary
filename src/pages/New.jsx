@@ -10,12 +10,7 @@ const New = () => {
   const nav = useNavigate();
 
   const onSubmit = (input) => {
-    onCreate(
-      input.createdDate.getTime(),
-      input.weather,
-      input.content,
-      input.diary
-    );
+    onCreate(input.createdDate, input.weather, input.content, input.diary);
     nav("/", { replace: true });
   };
 

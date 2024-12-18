@@ -1,43 +1,27 @@
 // src/components/WeatherDisplay/WeatherDisplay.jsx
-
 import { useEffect } from "react";
 import { useWeather } from "../../hooks/useWeather";
 
-const WeatherDisplay = ({ locationData, onWeatherUpdate, isEditMode }) => {
-  console.log("WeatherDisplay props:", { locationData, isEditMode });
-
+const WeatherDisplay = ({
+  locationData,
+  onWeatherUpdate,
+  isEditMode,
+  savedWeather,
+}) => {
   const { weatherData, error, loading, getWeatherWithLocation } =
     useWeather(locationData);
 
   useEffect(() => {
-    let isSubscribed = true; // 비동기 작업 취소를 위한 flag
+    let isSubscribed = true;
 
     const initWeather = async () => {
-      // Edit 모드이고 locationData가 있는 경우
-      if (isEditMode && locationData) {
-        if (!locationData.cityName || !locationData.temp) {
-          console.error("Invalid location data in edit mode:", locationData);
-          return;
-        }
-
-        const existingWeatherData = {
-          cityName: locationData.cityName,
-          temp: locationData.temp,
-          weather: locationData.weather,
-          icon: locationData.icon,
-          location: {
-            lat: locationData.location?.lat || locationData.lat || 0,
-            lon: locationData.location?.lon || locationData.lon || 0,
-          },
-        };
-
+      if (isEditMode && savedWeather) {
         if (isSubscribed && onWeatherUpdate) {
-          onWeatherUpdate(existingWeatherData);
+          onWeatherUpdate(savedWeather);
         }
         return;
       }
 
-      // New 모드이거나 locationData가 없는 경우
       if (!isEditMode) {
         try {
           const data = await getWeatherWithLocation();
@@ -51,12 +35,10 @@ const WeatherDisplay = ({ locationData, onWeatherUpdate, isEditMode }) => {
     };
 
     initWeather();
-
-    // Cleanup function
     return () => {
       isSubscribed = false;
     };
-  }, [isEditMode, locationData]); // 의존성 배열 최소화
+  }, [isEditMode, savedWeather, getWeatherWithLocation, onWeatherUpdate]);
 
   if (loading) {
     return (
@@ -65,7 +47,6 @@ const WeatherDisplay = ({ locationData, onWeatherUpdate, isEditMode }) => {
   }
 
   if (error) {
-    console.error("Weather display error:", error);
     return (
       <div className="weather-display error">
         날씨 정보를 불러오는데 실패했습니다
@@ -73,34 +54,32 @@ const WeatherDisplay = ({ locationData, onWeatherUpdate, isEditMode }) => {
     );
   }
 
-  if (!weatherData && !isEditMode) {
+  const displayData = isEditMode ? savedWeather : weatherData;
+
+  if (!displayData) {
     return (
       <div className="weather-display no-data">날씨 정보를 불러오는 중...</div>
     );
   }
 
-  if (!weatherData && isEditMode && !locationData) {
-    return null;
-  }
-
   return (
     <div className="weather-display">
       <div className="weather-icon">
-        {weatherData?.icon && (
+        {displayData.icon && (
           <img
-            src={`http://openweathermap.org/img/wn/${weatherData.icon}@2x.png`}
+            src={`http://openweathermap.org/img/wn/${displayData.icon}@2x.png`}
             alt="날씨 아이콘"
           />
         )}
       </div>
       <div className="weather-info">
         <div className="city-name">
-          {weatherData?.cityName || "알 수 없는 위치"}
+          {displayData.cityName || "알 수 없는 위치"}
         </div>
         <div className="temperature">
-          {weatherData?.temp ? `${Math.round(weatherData.temp)}°C` : ""}
+          {displayData.temp ? `${Math.round(displayData.temp)}°C` : ""}
         </div>
-        <div className="description">{weatherData?.weather || ""}</div>
+        <div className="description">{displayData.weather || ""}</div>
       </div>
     </div>
   );

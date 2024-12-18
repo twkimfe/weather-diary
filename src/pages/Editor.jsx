@@ -1,115 +1,70 @@
 // src/pages/Editor.jsx
-import "./Editor.css";
+
+import { useCallback, useState, useRef } from "react";
 import WeatherDisplay from "../components/WeatherDisplay/WeatherDisplay";
 import Button from "../components/Button/Button";
-import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentWeather } from "../api/weatherApi";
-import { getCurrentLocation } from "../utils/locationUtils";
 import { getStringedDate } from "../utils/get-stringed-date";
+import "./Editor.css";
 
 const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
   const nav = useNavigate();
-  const [input, setInput] = useState({
-    createdDate: new Date(),
-    content: "",
-    diary: "",
+  const weatherDataRef = useRef(null);
+
+  // timestamp를 Date 객체로 변환하거나 현재 날짜 사용
+  const initialDate = initData?.createdDate
+    ? new Date(Number(initData.createdDate))
+    : new Date();
+
+  const [formData, setFormData] = useState({
+    createdDate: initData?.createdDate
+      ? new Date(Number(initData.createdDate))
+      : new Date(),
+    content: initData?.content || "",
+    diary: initData?.diary || "",
   });
 
-  const handleWeatherUpdate = (weatherData) => {
-    setInput((prev) => ({
+  const handleWeatherUpdate = useCallback(
+    (weatherData) => {
+      // 수정 모드가 아닐 때만 날씨 데이터 업데이트
+      if (!initData) {
+        weatherDataRef.current = weatherData;
+      }
+    },
+    [initData]
+  );
+
+  const onChangeInput = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      weather: weatherData,
+      [name]:
+        name === "createdDate"
+          ? new Date(value + "T00:00:00") // 날짜 문자열을 Date 객체로 변환
+          : value,
     }));
-  };
+  }, []);
 
-  const [error, setError] = useState(null); // 에러 상태 추가
-  const fetchWeather = useCallback(async () => {
-    try {
-      // initData가 있으면 저장된 위치 정보 사용
-      let locationData;
-      if (initData?.weather?.location) {
-        locationData = initData.weather.location;
-      } else {
-        // 현재 위치 정보 가져오기 시도
-        try {
-          locationData = await getCurrentLocation();
-        } catch (locationError) {
-          setError(locationError.message);
+  const onSubmitButtonClick = useCallback(() => {
+    // Date 객체를 timestamp로 변환
+    const timestamp =
+      formData.createdDate instanceof Date
+        ? formData.createdDate.getTime()
+        : new Date(formData.createdDate).getTime();
 
-          console.log("위치 정보를 가져올 수 없습니다");
-          return;
-        }
-      }
+    const submissionData = {
+      ...formData,
+      createdDate: timestamp,
+      weather: initData?.weather || weatherDataRef.current,
+    };
 
-      // 위치 정보 검증
-      if (!locationData || !locationData.lat || !locationData.lon) {
-        throw new Error("유효하지 않은 위치 정보입니다");
-      }
-
-      const weatherData = await getCurrentWeather(
-        locationData.lat,
-        locationData.lon
-      );
-
-      setInput((prev) => ({
-        ...prev,
-        weather: {
-          cityName: weatherData.cityName,
-          temp: weatherData.temp,
-          weather: weatherData.weather,
-          icon: weatherData.icon,
-          location: {
-            lat: locationData.lat,
-            lon: locationData.lon,
-          },
-        },
-      }));
-
-      // 날씨 정보를 성공적으로 가져왔으면 에러 상태 초기화
-      setError(null);
-    } catch (error) {
-      console.error("날씨 정보 가져오기 실패:", error);
-      setError(
-        "날씨 정보를 가져오는데 실패했습니다. 잠시 후 다시 시도해주세요."
-      );
-    }
-  }, [initData]);
-
-  // 컴포넌트 마운트 시 날씨 정보 가져오기
-  useEffect(() => {
-    if (!initData) {
-      // 새 일기 작성 시에만 현재 날씨 가져오기
-      fetchWeather();
-    }
-  }, [fetchWeather, initData]);
-
-  useEffect(() => {
-    if (initData) {
-      setInput({
-        ...initData,
-        createdDate: new Date(Number(initData.createdDate)),
-      });
-    }
-  }, [initData]);
-
-  const onChangeInput = (e) => {
-    let name = e.target.name;
-    let value = e.target.value;
-
-    if (name === "createdDate") {
-      value = new Date(value);
+    if (!submissionData.weather) {
+      alert("날씨 정보가 필요합니다.");
+      return;
     }
 
-    setInput({
-      ...input,
-      [name]: value,
-    });
-  };
-
-  const onSubmitButtonClick = () => {
-    onSubmit(input);
-  };
+    onSubmit(submissionData);
+  }, [formData, initData, onSubmit]);
 
   return (
     <div className="Editor">
@@ -118,7 +73,7 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
         <input
           name="createdDate"
           onChange={onChangeInput}
-          value={getStringedDate(input.createdDate)}
+          value={getStringedDate(formData.createdDate)}
           type="date"
         />
       </section>
@@ -127,6 +82,8 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
         <WeatherDisplay
           locationData={initData?.weather?.location}
           onWeatherUpdate={handleWeatherUpdate}
+          isEditMode={!!initData}
+          savedWeather={initData?.weather}
         />
         {showWeatherInfo && <p className="info">날씨는 수정이 안되요.</p>}
       </section>
@@ -134,7 +91,7 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
         <h4>일기 제목</h4>
         <textarea
           name="content"
-          value={input.content}
+          value={formData.content}
           onChange={onChangeInput}
           placeholder="제목을 입력해주세요."
         />
@@ -143,21 +100,16 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
         <h4>일기 내용</h4>
         <textarea
           name="diary"
-          value={input.diary}
+          value={formData.diary}
           onChange={onChangeInput}
           placeholder="오늘은 어땠나요?"
         />
       </section>
       <section className="button_section">
-        <Button onClick={() => nav(-1)} text={"취소하기"} />
-        <Button
-          onClick={onSubmitButtonClick}
-          text={"저장하기"}
-          type={"POSITIVE"}
-        />
+        <Button onClick={() => nav(-1)} text="취소하기" />
+        <Button onClick={onSubmitButtonClick} text="저장하기" type="POSITIVE" />
       </section>
     </div>
   );
 };
-
 export default Editor;
