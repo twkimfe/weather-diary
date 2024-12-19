@@ -39,8 +39,6 @@ const useDiary = (id) => {
         },
       },
     };
-    console.log("Original Item:", currentDiaryItem);
-    console.log("Processed Item:", processedItem);
 
     setCurDiaryItem(processedItem);
   }, [id, data, nav]);

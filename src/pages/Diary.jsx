@@ -9,7 +9,7 @@ const Diary = () => {
   const params = useParams();
   const nav = useNavigate();
 
-  const curDiaryItem = useDiary(params.id);
+  const { curDiaryItem } = useDiary(params.id);
   console.log(curDiaryItem);
 
   if (!curDiaryItem) {

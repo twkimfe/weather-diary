@@ -5,10 +5,12 @@ import { useWeather } from "../../hooks/useWeather";
 const WeatherDisplay = ({
   locationData,
   onWeatherUpdate,
-  isEditMode,
   savedWeather,
+  useSavedWeather = false,
+  // New: useSavedWeather = false (실시간 날씨)
+  // Home/ Diary / Edit: useSavedWeather = true (저장된 날씨)
 }) => {
-  console.log("WeatherDisplay props:", { locationData, isEditMode });
+  console.log("WeatherDisplay props:", { locationData, useSavedWeather });
 
   const { weatherData, error, loading, getWeatherWithLocation } =
     useWeather(locationData);
@@ -17,14 +19,14 @@ const WeatherDisplay = ({
     let isSubscribed = true;
 
     const initWeather = async () => {
-      if (isEditMode && savedWeather) {
+      if (useSavedWeather && savedWeather) {
         if (isSubscribed && onWeatherUpdate) {
           onWeatherUpdate(savedWeather);
         }
         return;
       }
 
-      if (!isEditMode) {
+      if (!useSavedWeather) {
         try {
           const data = await getWeatherWithLocation();
           if (isSubscribed && data && onWeatherUpdate) {
@@ -40,7 +42,7 @@ const WeatherDisplay = ({
     return () => {
       isSubscribed = false;
     };
-  }, [isEditMode, savedWeather, getWeatherWithLocation, onWeatherUpdate]);
+  }, [useSavedWeather, savedWeather, getWeatherWithLocation, onWeatherUpdate]);
 
   if (loading) {
     return (
@@ -56,7 +58,7 @@ const WeatherDisplay = ({
     );
   }
 
-  const displayData = isEditMode ? savedWeather : weatherData;
+  const displayData = useSavedWeather ? savedWeather : weatherData;
 
   if (!displayData) {
     return (

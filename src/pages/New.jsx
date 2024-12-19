@@ -20,7 +20,11 @@ const New = () => {
         title={"새 일기 쓰기"}
         leftChild={<Button onClick={() => nav(-1)} text={"<"} />}
       />
-      <Editor onSubmit={onSubmit} showWeatherInfo={false} />
+      <Editor
+        onSubmit={onSubmit}
+        showWeatherInfo={false}
+        useSavedWeather={false}
+      />
     </div>
   );
 };

@@ -1,16 +1,19 @@
 import Button from "../Button/Button";
 import "./DiaryItem.css";
 import { useNavigate } from "react-router-dom";
-import { getWeatherImage } from "../../utils/weatherIcon";
 import WeatherDisplay from "../WeatherDisplay/WeatherDisplay";
 
-const DiaryItem = ({ id, weather, createdDate, content, location }) => {
+const DiaryItem = ({ id, createdDate, weather, content, location }) => {
   const nav = useNavigate();
 
   return (
     <div className="DiaryItem">
       <div onClick={() => nav(`/diary/${id}`)} className="weather_section">
-        <WeatherDisplay locationData={location} />
+        <WeatherDisplay
+          useSavedWeather={true}
+          savedWeather={weather}
+          locationData={location}
+        />
       </div>
       <div onClick={() => nav(`/diary/${id}`)} className="info_section">
         <div className="created_date">

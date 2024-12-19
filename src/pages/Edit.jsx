@@ -24,13 +24,13 @@ const Edit = () => {
 
   const onSubmit = (input) => {
     if (window.confirm("일기를 정말 수정할까요?")) {
-      onUpdate(
-        params.id,
-        input.createdDate.getTime(),
-        input.weather,
-        input.content,
-        input.diary
-      );
+      // input.createdDate가 Date 객체가 아닐 경우를 대비한 안전한 처리
+      const timestamp =
+        input.createdDate instanceof Date
+          ? input.createdDate.getTime()
+          : Number(input.createdDate);
+
+      onUpdate(params.id, timestamp, input.weather, input.content, input.diary);
       nav("/", { replace: true });
     }
   };
@@ -59,6 +59,7 @@ const Edit = () => {
         initData={curDiaryItem}
         onSubmit={onSubmit}
         showWeatherInfo={true}
+        useSavedWeather={true}
       />
     </div>
   );

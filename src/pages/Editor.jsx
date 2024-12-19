@@ -7,7 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { getStringedDate } from "../utils/get-stringed-date";
 import "./Editor.css";
 
-const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
+const Editor = ({
+  initData,
+  onSubmit,
+  useSavedWeather,
+  showWeatherInfo = false,
+}) => {
   const nav = useNavigate();
   const weatherDataRef = useRef(null);
 
@@ -21,7 +26,7 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
   useEffect(() => {
     if (initData) {
       setFormData({
-        createdDate: new Date(Number(initData.createdDate)),
+        createdDate: new Date(initData.createdDate),
         content: initData.content,
         diary: initData.diary,
       });
@@ -89,8 +94,8 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
           <WeatherDisplay
             locationData={initData?.weather?.location}
             onWeatherUpdate={handleWeatherUpdate}
-            isEditMode={!!initData}
             savedWeather={initData?.weather}
+            useSavedWeather={useSavedWeather}
           />
         </div>
         {showWeatherInfo && <p className="info">날씨는 수정이 안되요.</p>}

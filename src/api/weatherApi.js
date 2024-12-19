@@ -61,6 +61,7 @@ export const getCurrentWeather = async (lat, lon) => {
     });
 
     console.log(data);
+    console.log(weatherData);
     console.log("API Response:", response); // 응답 데이터 구조 확인
 
     return weatherData;

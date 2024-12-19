@@ -7,7 +7,7 @@ const Viewer = ({ weather, content, diary }) => {
       <section className="img_section">
         <h4>오늘의 날씨</h4>
         <div className="weather">
-          <WeatherDisplay />
+          <WeatherDisplay useSavedWeather={true} savedWeather={weather} />
         </div>
       </section>
       <section className="content_section">
