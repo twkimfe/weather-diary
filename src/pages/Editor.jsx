@@ -1,6 +1,6 @@
 // src/pages/Editor.jsx
 
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import WeatherDisplay from "../components/WeatherDisplay/WeatherDisplay";
 import Button from "../components/Button/Button";
 import { useNavigate } from "react-router-dom";
@@ -11,18 +11,22 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
   const nav = useNavigate();
   const weatherDataRef = useRef(null);
 
-  // timestamp를 Date 객체로 변환하거나 현재 날짜 사용
-  const initialDate = initData?.createdDate
-    ? new Date(Number(initData.createdDate))
-    : new Date();
-
   const [formData, setFormData] = useState({
-    createdDate: initData?.createdDate
-      ? new Date(Number(initData.createdDate))
-      : new Date(),
-    content: initData?.content || "",
-    diary: initData?.diary || "",
+    createdDate: new Date(),
+    content: "",
+    diary: "",
   });
+
+  // initData 변경 감지 및 상태 업데이트
+  useEffect(() => {
+    if (initData) {
+      setFormData({
+        createdDate: new Date(Number(initData.createdDate)),
+        content: initData.content,
+        diary: initData.diary,
+      });
+    }
+  }, [initData]);
 
   const handleWeatherUpdate = useCallback(
     (weatherData) => {
@@ -66,6 +70,8 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
     onSubmit(submissionData);
   }, [formData, initData, onSubmit]);
 
+  console.log("Editor received initData:", initData);
+
   return (
     <div className="Editor">
       <section className="date_section">
@@ -79,12 +85,14 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
       </section>
       <section className="weather_section">
         <h4>오늘의 날씨</h4>
-        <WeatherDisplay
-          locationData={initData?.weather?.location}
-          onWeatherUpdate={handleWeatherUpdate}
-          isEditMode={!!initData}
-          savedWeather={initData?.weather}
-        />
+        <div className="weather_display">
+          <WeatherDisplay
+            locationData={initData?.weather?.location}
+            onWeatherUpdate={handleWeatherUpdate}
+            isEditMode={!!initData}
+            savedWeather={initData?.weather}
+          />
+        </div>
         {showWeatherInfo && <p className="info">날씨는 수정이 안되요.</p>}
       </section>
       <section className="content_section">
@@ -106,8 +114,8 @@ const Editor = ({ initData, onSubmit, showWeatherInfo = false }) => {
         />
       </section>
       <section className="button_section">
-        <Button onClick={() => nav(-1)} text="취소하기" />
-        <Button onClick={onSubmitButtonClick} text="저장하기" type="POSITIVE" />
+        <Button onClick={() => nav(-1)} text="취소" />
+        <Button onClick={onSubmitButtonClick} text="저장" type="POSITIVE" />
       </section>
     </div>
   );

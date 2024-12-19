@@ -10,12 +10,15 @@ const Edit = () => {
   const params = useParams();
   const nav = useNavigate();
   const { onDelete, onUpdate } = useContext(DiaryDispatchContext);
-  const curDiaryItem = useDiary(params.id);
+  const { curDiaryItem, setDeleteOperation } = useDiary(params.id);
 
-  const onClickDelete = () => {
+  const onClickDelete = async () => {
     if (window.confirm("일기를 삭제합니다. 삭제하면 복구가 안 됩니다.")) {
-      onDelete(params.id);
-      nav("/", { replace: true });
+      setDeleteOperation(true); // 삭제 작업 시작
+      const success = await onDelete(params.id);
+      if (success) {
+        nav("/", { replace: true });
+      }
     }
   };
 
@@ -31,11 +34,17 @@ const Edit = () => {
       nav("/", { replace: true });
     }
   };
+  console.log("Edit initData:", curDiaryItem);
+
+  // 로딩 상태 처리
+  if (!curDiaryItem) {
+    return <div>로딩중입니다...</div>;
+  }
 
   return (
     <div>
       <Header
-        title={"일기 수정하기"}
+        title={"일기 수정"}
         leftChild={
           <>
             <Button onClick={() => nav(-1)} text={"<"} />
@@ -43,7 +52,7 @@ const Edit = () => {
           </>
         }
         rightChild={
-          <Button onClick={onClickDelete} text={"삭제하기"} type={"NEGATIVE"} />
+          <Button onClick={onClickDelete} text={"삭제"} type={"NEGATIVE"} />
         }
       />
       <Editor

@@ -8,6 +8,8 @@ const WeatherDisplay = ({
   isEditMode,
   savedWeather,
 }) => {
+  console.log("WeatherDisplay props:", { locationData, isEditMode });
+
   const { weatherData, error, loading, getWeatherWithLocation } =
     useWeather(locationData);
 

@@ -43,6 +43,12 @@ textarea {
   align-items: center;
 }
 
+.Editor .weather_section .weather_display > * {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .Editor .weather_section .weather > * {
   display: flex;
   justify-content: center;

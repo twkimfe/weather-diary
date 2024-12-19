@@ -113,11 +113,14 @@ function App() {
   };
 
   // 기존 일기 삭제
-  const onDelete = (id) => {
-    dispatch({
-      type: "DELETE",
-      id,
-    });
+  const onDelete = async (id) => {
+    try {
+      dispatch({ type: "DELETE", id });
+      return true;
+    } catch (error) {
+      console.error("삭제 처리 실패:", error);
+      return false;
+    }
   };
 
   if (isLoading) {
