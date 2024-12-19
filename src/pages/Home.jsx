@@ -4,6 +4,7 @@ import { DiaryStateContext } from "../App";
 import Header from "../components/Header/Header";
 import Button from "../components/Button/Button";
 import DiaryList from "../components/DiaryList/DiaryList";
+import usePageTitle from "../hooks/usePageTitle";
 
 const getMonthlyData = (pivotDate, data) => {
   const beginTime = new Date(
@@ -35,6 +36,7 @@ const Home = () => {
   const [originalMonth] = useState(new Date());
   // 초기 월 저장
   const [monthlyData, setMonthlyData] = useState([]); // 월별 데이터 상태 추가
+  usePageTitle("날씨 일기장");
 
   // useEffect로 data 변경 감지 및 monthlyData 업데이트
   useEffect(() => {

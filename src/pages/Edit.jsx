@@ -5,12 +5,14 @@ import Editor from "./Editor";
 import { useContext } from "react";
 import { DiaryDispatchContext } from "../App";
 import useDiary from "../hooks/useDiary";
+import usePageTitle from "../hooks/usePageTitle";
 
 const Edit = () => {
   const params = useParams();
   const nav = useNavigate();
   const { onDelete, onUpdate } = useContext(DiaryDispatchContext);
   const { curDiaryItem, setDeleteOperation } = useDiary(params.id);
+  usePageTitle("일기 수정하기");
 
   const onClickDelete = async () => {
     if (window.confirm("일기를 삭제합니다. 삭제하면 복구가 안 됩니다.")) {
