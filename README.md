@@ -1,8 +1,4 @@
-# React + Vite
+**날씨 일기장**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+react + vite 개발 환경에서 현지 날씨를 openWeatherAPI로 호출하여, 
+일기 작성에 도움을 주는 웹기능을 개발했습니다.
