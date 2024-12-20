@@ -37,6 +37,11 @@ const DiaryList = ({ data }) => {
         {sortedData.map((item) => (
           <DiaryItem key={item.id} {...item} />
         ))}
+        {sortedData.length === 0 && (
+          <div className="new_info">
+            <text>"새 일기 쓰기" 버튼을 눌러서 일기를 써보세요!</text>
+          </div>
+        )}
       </div>
     </div>
   );

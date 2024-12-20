@@ -60,10 +60,6 @@ export const getCurrentWeather = async (lat, lon) => {
       timestamp: Date.now(),
     });
 
-    console.log(data);
-    console.log(weatherData);
-    console.log("API Response:", response); // 응답 데이터 구조 확인
-
     return weatherData;
   } catch (error) {
     console.error("날씨 정보를 가져오는데 실패했습니다:", error);

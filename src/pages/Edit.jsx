@@ -36,7 +36,6 @@ const Edit = () => {
       nav("/", { replace: true });
     }
   };
-  console.log("Edit initData:", curDiaryItem);
 
   // 로딩 상태 처리
   if (!curDiaryItem) {

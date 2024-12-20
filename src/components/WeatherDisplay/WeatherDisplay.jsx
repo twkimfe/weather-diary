@@ -10,8 +10,6 @@ const WeatherDisplay = ({
   // New: useSavedWeather = false (실시간 날씨)
   // Home/ Diary / Edit: useSavedWeather = true (저장된 날씨)
 }) => {
-  console.log("WeatherDisplay props:", { locationData, useSavedWeather });
-
   const { weatherData, error, loading, getWeatherWithLocation } =
     useWeather(locationData);
 

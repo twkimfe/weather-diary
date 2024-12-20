@@ -75,8 +75,6 @@ const Editor = ({
     onSubmit(submissionData);
   }, [formData, initData, onSubmit]);
 
-  console.log("Editor received initData:", initData);
-
   return (
     <div className="Editor">
       <section className="date_section">
